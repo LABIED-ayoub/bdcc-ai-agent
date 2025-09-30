@@ -5,6 +5,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.transformer.splitter.TextSplitter;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
@@ -23,46 +24,45 @@ public class DocumentIndexor {
     private Resource pdfResource;
     @Value("store.json")
     private String fileStore;
-    private EmbeddingModel embeddingModel;
+    private SimpleVectorStore vectorStore;
 
-    public DocumentIndexor(EmbeddingModel embeddingModel) {
-        this.embeddingModel = embeddingModel;
+    public DocumentIndexor(SimpleVectorStore vectorStore) {
+        this.vectorStore = vectorStore;
     }
 
-    public SimpleVectorStore loadFile(MultipartFile pdfFile) throws IOException {
-        SimpleVectorStore vectorStore = SimpleVectorStore.builder(embeddingModel).build();
+
+    public void loadFile(MultipartFile pdfFile) throws IOException {
         Path path = Path.of("src", "main", "resources", "pdfs");
         File file = new File(path.toFile(), fileStore);
-        if (!file.exists()) {
-            PagePdfDocumentReader pdfDocumentReader =
-                    new PagePdfDocumentReader(pdfFile.getResource());
-            List<Document> documents = pdfDocumentReader.get();
-            TextSplitter textSplitter = new TokenTextSplitter();
-            List<Document> chunks = textSplitter.split(documents);
-            vectorStore.add(chunks);
-            vectorStore.save(file);
-        } else {
+        if (file.exists()) {
             vectorStore.load(file);
         }
-        return vectorStore;
+
+        PagePdfDocumentReader pdfDocumentReader =
+                new PagePdfDocumentReader(pdfFile.getResource());
+        List<Document> documents = pdfDocumentReader.get();
+        TextSplitter textSplitter = new TokenTextSplitter();
+        List<Document> chunks = textSplitter.split(documents);
+        vectorStore.add(chunks);
+        vectorStore.save(file);
     }
 
-    @Bean
-    public SimpleVectorStore getVectorStore(EmbeddingModel embeddingModel) {
-        SimpleVectorStore vectorStore = SimpleVectorStore.builder(embeddingModel).build();
-        Path path = Path.of("src", "main", "resources", "pdfs");
-        File file = new File(path.toFile(), fileStore);
-        if (!file.exists()) {
-            PagePdfDocumentReader pdfDocumentReader =
-                    new PagePdfDocumentReader(pdfResource);
-            List<Document> documents = pdfDocumentReader.get();
-            TextSplitter textSplitter = new TokenTextSplitter();
-            List<Document> chunks = textSplitter.split(documents);
-            vectorStore.add(chunks);
-            vectorStore.save(file);
-        } else {
-            vectorStore.load(file);
-        }
-        return vectorStore;
-    }
+//    @Bean
+//    public SimpleVectorStore getVectorStore(EmbeddingModel embeddingModel) {
+//        SimpleVectorStore vectorStore = SimpleVectorStore.builder(embeddingModel).build();
+//        Path path = Path.of("src", "main", "resources", "pdfs");
+//        File file = new File(path.toFile(), fileStore);
+//        if (!file.exists()) {
+//            PagePdfDocumentReader pdfDocumentReader =
+//                    new PagePdfDocumentReader(pdfResource);
+//            List<Document> documents = pdfDocumentReader.get();
+//            TextSplitter textSplitter = new TokenTextSplitter();
+//            List<Document> chunks = textSplitter.split(documents);
+//            vectorStore.add(chunks);
+//            vectorStore.save(file);
+//        } else {
+//            vectorStore.load(file);
+//        }
+//        return vectorStore;
+//    }
 }

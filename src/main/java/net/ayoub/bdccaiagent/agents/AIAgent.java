@@ -21,7 +21,7 @@ public class AIAgent {
                 )
                 .defaultTools(agentTools)
                 .defaultAdvisors(new SimpleLoggerAdvisor())
-                .defaultAdvisors(new QuestionAnswerAdvisor(vectorStore))
+//                .defaultAdvisors(new QuestionAnswerAdvisor(vectorStore))
                 .build();
     }
 

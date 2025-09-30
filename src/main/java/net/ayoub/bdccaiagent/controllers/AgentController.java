@@ -27,7 +27,7 @@ public class AgentController {
     }
 
     @PostMapping(value = "/loadFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces =  MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void loadFile(@RequestParam("file") MultipartFile file) throws IOException {
+    public void loadFile(@RequestPart("file") MultipartFile file) throws IOException {
         indexor.loadFile(file);
     }
 
