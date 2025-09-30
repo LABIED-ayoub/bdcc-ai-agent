@@ -1,6 +1,6 @@
 # BDCC AI Agent
 
-This project is a RAG-based AI agent built with Spring Boot and Spring AI. It allows users to ask questions and get answers from an AI model that can be augmented with knowledge from uploaded documents.
+This project is a RAG-based AI agent built with Spring Boot and Spring AI, using Ollama and the Mistral model. It allows users to ask questions and get answers from an AI model that can be augmented with knowledge from uploaded documents.
 
 ## API Endpoints
 
@@ -40,14 +40,14 @@ This project is a RAG-based AI agent built with Spring Boot and Spring AI. It al
 1. **Prerequisites:**
    - Java 21 or higher
    - Maven
-   - An OpenAI API key
+   - Ollama installed and running. You can download it from [https://ollama.ai/](https://ollama.ai/).
+   - The Mistral model installed in Ollama. You can install it by running:
+     ```bash
+     ollama pull mistral
+     ```
 
 2. **Configuration:**
-   - Open `src/main/resources/application.properties`.
-   - Add your OpenAI API key:
-     ```properties
-     spring.ai.openai.api-key=YOUR_OPENAI_API_KEY
-     ```
+   - The application is configured to connect to Ollama at `http://localhost:11434` and use the `mistral` model by default. You can change these settings in `src/main/resources/application.properties`.
 
 3. **Running the Application:**
    - Use the following Maven command to run the application:
